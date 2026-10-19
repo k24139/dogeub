@@ -30,7 +30,7 @@ const Logo = memo(({ options, action, width, height }) => {
       className={className}
       id="btn-logo"
       draggable="false"
-      alt="logo"
+      alt="nutub"
       onClick={action}
       style={style}
     />

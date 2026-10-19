@@ -1,6 +1,12 @@
-# DogeUB
+# nutub
 
-DogeUB is a customizable hub for apps, games, bookmarks, and browser tools. The interface includes searchable app and game catalogs, saved links, appearance settings, and a private browsing view for self-hosted deployments.
+nutub is a customizable hub for apps, games, bookmarks, and browser tools. The interface includes searchable app and game catalogs, saved links, appearance settings, and a private browsing view for self-hosted deployments.
+
+nutub is based on the DogeUB project. Original license and attribution notices remain in place.
+
+## Startup behavior
+
+Opening the app in an about:blank tab is enabled by default. The setting respects an explicit off choice. If the browser blocks automatic popups, use the Open about:blank button or allow popups for the site. The original page stays open. The embedded app does not reopen itself. Run the startup checks with `node --test tests/about-blank.test.mjs`.
 
 ## Development
 
@@ -15,9 +21,9 @@ Create a production build with `npm run build`. Run it with `node server.js`. Th
 
 ## ChatGPT Sites
 
-ChatGPT Sites can host the static DogeUB interface, apps, games, bookmarks, and settings. Sites Workers do not provide the persistent Node process or raw TCP sockets required by DogeUB's Bare/Wisp private browser. The hosted build displays this limitation on the browsing page. Use the Node deployment above to run that feature.
+ChatGPT Sites can host the static nutub interface, apps, games, bookmarks, and settings. Sites Workers do not provide the persistent Node process or raw TCP sockets required by nutub's Bare/Wisp private browser. The hosted build displays this limitation on the browsing page. Use the Node deployment above to run that feature.
 
-The app catalog is bundled in `src/data/apps.json`, so builds do not fetch executable configuration from an external catalog server. The Node server provides DuckDuckGo autocomplete and proxies catalog artwork from DogeUB's existing asset host. Sites builds load that artwork directly from the same host. App and game destinations remain externally hosted and follow their own content and privacy policies.
+The app catalog is bundled in `src/data/apps.json`, so builds do not fetch executable configuration from an external catalog server. The Node server provides DuckDuckGo autocomplete and proxies catalog artwork from nutub's existing asset host. Sites builds load that artwork directly from the same host. App and game destinations remain externally hosted and follow their own content and privacy policies.
 
 ## Dependencies and attribution
 

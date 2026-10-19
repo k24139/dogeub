@@ -30,10 +30,10 @@ function HostedBrowsingNotice({ destination }) {
           <AlertTriangle className="mx-auto mb-4" aria-hidden="true" />
           <h1 className="text-xl font-semibold">Private browsing needs a separate server</h1>
           <p className="mt-3 text-sm leading-6 text-gray-300">
-            ChatGPT Sites can host DogeUB’s apps, games, bookmarks, and settings. Its runtime
+            ChatGPT Sites can host nutub’s apps, games, bookmarks, and settings. Its runtime
             cannot run the persistent Node and raw TCP services used by the private browser.
             This feature stays available in self-hosted deployments. You can open a destination
-            directly in a new tab, outside DogeUB’s private browser.
+            directly in a new tab, outside nutub’s private browser.
           </p>
           {directUrl && (
             <a
@@ -46,7 +46,7 @@ function HostedBrowsingNotice({ destination }) {
             </a>
           )}
           <a className="mt-5 inline-flex rounded-lg bg-white/10 px-4 py-2 text-sm hover:bg-white/15" href="/">
-            Return to DogeUB
+            Return to nutub
           </a>
         </section>
       </main>

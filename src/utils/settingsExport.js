@@ -1,4 +1,4 @@
-const NAME = 'dogeub-settings.json';
+const NAME = 'nutub-settings.json';
 
 const dataUrl = (o) =>
   URL.createObjectURL(new Blob([JSON.stringify(o, null, 2)], { type: 'application/json' }));

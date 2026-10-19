@@ -77,10 +77,8 @@ export const privacyConfig = ({ options, updateOption, openPanic }) => {
 
   config[5] = {
     name: 'Open about:blank on startup',
-    desc: 'When enabled, the about:blank tab opens automatically when you visit.',
-    value:
-      options.aboutBlankAutoOpen === true ||
-      (options.aboutBlank && options.aboutBlankAutoOpen !== false),
+    desc: 'On by default. Opens the app in an about:blank tab. Browsers that block automatic popups require a click.',
+    value: options.aboutBlankAutoOpen !== false,
     type: 'switch',
     action: (b) => setTimeout(() => updateOption({ aboutBlankAutoOpen: b }), 100),
   };
