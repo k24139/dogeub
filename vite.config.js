@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cp, copyFile, mkdir } from 'node:fs/promises';
+import process from 'node:process';
 import react from '@vitejs/plugin-react-swc';
 import vitePluginBundleObfuscator from 'vite-plugin-bundle-obfuscator';
 import { logging, server as wisp } from '@mercuryworkshop/wisp-js/server';
