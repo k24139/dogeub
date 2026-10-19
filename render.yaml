@@ -1,6 +1,15 @@
- services:
+services:
   - type: web
-    name: educational-website
-    env: node
+    name: nutub-private-browser
     plan: free
-    startCommand: npm install && npm run build && node server.js
+    branch: cleanup/sites-deployment
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: PROXY_PASSWORD
+        sync: false
+      - key: FRONTEND_ORIGINS
+        value: https://dogeub.basicpuppy5.chatgpt.site

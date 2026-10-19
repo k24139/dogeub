@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import NavItem from '../components/NavItem';
-import { LayoutGrid, Gamepad2, Cog } from 'lucide-react';
+import { LayoutGrid, Gamepad2, Cog, Globe2 } from 'lucide-react';
 import { useOptions } from '/src/utils/optionsContext';
 import pkg from '../../package.json';
 import nav from '../styles/nav.module.css';
@@ -13,6 +13,7 @@ const version = pkg.version;
 const itemSize = 16;
 
 const navItems = [
+  { name: 'Private Browser', id: 'btn-browser', type: Globe2, route: '/search' },
   { name: 'Apps', id: 'btn-a', type: LayoutGrid, route: '/materials' },
   { name: 'Games', id: 'btn-g', type: Gamepad2, route: '/docs' },
   { name: 'Settings', id: 'btn-s', type: Cog, route: '/settings' },
@@ -52,13 +53,13 @@ const Nav = memo(() => {
         nav.nav,
         theme['nav-backgroundColor'],
         theme[`theme-${options.theme || 'default'}`],
-        ' w-full shadow-x1/20 flex items-center pl-6 pr-5 gap-5 z-50',
+        ' w-full shadow-x1/20 flex items-center pl-4 pr-3 gap-3 sm:pl-6 sm:pr-5 sm:gap-5 z-50',
       )}
       style={{ height: `${dimensions.navHeight}px` }}
     >
       <Logo width={dimensions.logoWidth} height={dimensions.logoHeight} action={handleLogoClick} />
       <div
-        className="border rounded-full text-center"
+        className="hidden sm:block border rounded-full text-center"
         style={{
           fontSize: `${dimensions.versionFont}px`,
           marginLeft: `${dimensions.versionMargin}px`,
@@ -68,7 +69,7 @@ const Nav = memo(() => {
       >
         {'v' + version}
       </div>
-      <div className="flex items-center gap-5 ml-auto" style={{ height: 'calc(100% - 0.5rem)' }}>
+      <div className="flex items-center gap-3 sm:gap-5 ml-auto" style={{ height: 'calc(100% - 0.5rem)' }}>
         <NavItem items={items} />
       </div>
     </div>

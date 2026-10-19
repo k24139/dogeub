@@ -16,7 +16,10 @@ const NavItem = ({ items }) => {
         const Icon = item.type;
 
         return (
-          <span
+          <button
+            type="button"
+            title={item.name}
+            aria-label={item.name}
             key={item.id}
             className={clsx(
               'flex gap-1 items-center h-full cursor-pointer',
@@ -38,8 +41,8 @@ const NavItem = ({ items }) => {
                 size={Math.round(item.size * scale)}
               />
             )}
-            <span>{item.name}</span>
-          </span>
+            <span className="hidden sm:inline">{item.name}</span>
+          </button>
         );
       })}
     </>

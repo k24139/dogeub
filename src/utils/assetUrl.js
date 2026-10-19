@@ -1,7 +1,7 @@
 const assetOrigin = 'https://dogeub-assets.pages.dev';
 
 export function getAssetUrl(value) {
-  if (typeof value !== 'string' || import.meta.env.VITE_SITES_HOSTED !== true) return value;
+  if (typeof value !== 'string' || (import.meta.env.VITE_SITES_HOSTED !== true && import.meta.env.VITE_PROXY_RUNTIME !== true)) return value;
 
   if (value.startsWith('/assets/img/')) {
     return `${assetOrigin}/img/${value.slice('/assets/img/'.length)}`;

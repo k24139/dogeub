@@ -185,6 +185,7 @@ export default defineConfig(({ command }) => {
     define: {
       __ENVIRONMENT__: JSON.stringify(environment),
       'import.meta.env.VITE_SITES_HOSTED': process.env.SITES_HOSTED === 'true',
+      'import.meta.env.VITE_PROXY_RUNTIME': process.env.PROXY_RUNTIME === 'true',
     },
   };
 });

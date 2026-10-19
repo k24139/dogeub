@@ -12,9 +12,12 @@ const check = (inp, engine) => {
     trimmed.startsWith('localhost');
 
   if (isUrl) {
-    return trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+    try {
+      const url = new URL(/^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`);
+      return ['http:','https:'].includes(url.protocol) && !url.username && !url.password ? url.href : '';
+    } catch { return ''; }
   } else {
-    return engine + encodeURIComponent(trimmed);
+    return (engine || 'https://www.google.com/search?q=') + encodeURIComponent(trimmed);
   }
 };
 
@@ -43,7 +46,9 @@ export const process = (input, decode = false, prType, engine = "https://www.goo
       break;
     default:
       const url = check(input, engine);
-      const match = [...scrwlist].some(d => url.includes(d));
+      let host = '';
+      try { host = new URL(url).hostname; } catch {}
+      const match = [...scrwlist].some(d => host === d || host.endsWith('.'+d));
       prefix = match ? eggowaffle : upwefix;
   }
 

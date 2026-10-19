@@ -38,10 +38,7 @@ const Viewer = ({ conf = {} }) => {
       const handleLoad = () => {
         setLoading(tab.id, false);
         try {
-          const d = iframe.contentWindow?.document;
-          if (d?.getElementById('errorTrace-wrapper') || d?.getElementById('uvHostname')) {
-            iframe.contentWindow.location.replace(tab.url);
-          }
+
           if (!enableAlerts && iframe.contentWindow) {
             iframe.contentWindow.alert = () => {};
           }
@@ -85,11 +82,7 @@ const Viewer = ({ conf = {} }) => {
           const curURL = iframe.contentWindow.location.href;
           const curTTL = iframe.contentWindow.document.title;
           if (curURL === 'about:blank') return;
-          const d = iframe.contentWindow?.document;
-          if (d?.getElementById('errorTrace-wrapper') || d?.getElementById('uvHostname')) {
-            iframe.contentWindow.location.replace(tab.url);
-            return;
-          }
+
           if (!enableAlerts && iframe.contentWindow) {
             iframe.contentWindow.alert = () => {};
           }

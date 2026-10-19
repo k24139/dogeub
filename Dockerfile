@@ -1,47 +1,19 @@
-# syntax=docker/dockerfile:1.6
-
-########################
-# 1) Build stage
-########################
-# Use full Debian-based Node image for builds (has more tooling available)
-FROM node:20-bookworm AS build
+# The default container is the authenticated browser backend.
+FROM node:22-bookworm-slim AS build
 WORKDIR /app
-
-# Install deps (cached layer)
-COPY package*.json ./
-RUN npm ci
-
-# Copy source and build frontend
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
 COPY . .
-RUN npm run build
+RUN PROXY_RUNTIME=true SITES_HOSTED=false npm run build
 
-########################
-# 2) Runtime stage (Debian slim)
-########################
-# Slim runtime image (Debian bookworm-slim variant)
-FROM node:20-bookworm-slim AS runtime
-WORKDIR /app
-
+FROM node:22-bookworm-slim AS runtime
 ENV NODE_ENV=production
-# DogeUB documents PORT via env in copy.env
-ENV PORT=3000
-
-# Install only production deps
-COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
-
-# Copy only what runtime needs:
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/public ./public
-COPY --from=build /app/server.js ./server.js
-
-# Optional files seen in repo root (safe to include)
-COPY --from=build /app/masqr.js ./masqr.js
-COPY --from=build /app/Checkfailed.html ./Checkfailed.html
-COPY --from=build /app/placeholder.svg ./placeholder.svg
-
-# Run as non-root (the official node image defines a 'node' user)
+WORKDIR /app
+COPY backend/package.json backend/package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
+COPY --chown=node:node backend/*.mjs ./
+COPY --from=build --chown=node:node /app/dist ./public
+COPY --chown=node:node LICENSE ./public/LICENSE
 USER node
-
-EXPOSE 3000
-CMD ["node", "server.js"]
+EXPOSE 8080
+CMD ["node", "server.mjs"]

@@ -28,6 +28,7 @@ export const OptionsProvider = ({ children }) => {
 
     const current = getStoredOptions();
     const updated = { ...current, ...obj };
+    if (import.meta.env.VITE_PROXY_RUNTIME === true) window.dispatchEvent(new CustomEvent('nutub:options', {detail:obj}));
 
     try {
       localStorage.setItem('options', JSON.stringify(updated));

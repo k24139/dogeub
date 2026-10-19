@@ -166,7 +166,7 @@ export const browsingConfig = ({ options, updateOption }) => ({
     type: 'select',
     action: (a) => updateOption(a),
   },
-  ...(import.meta.env.VITE_SITES_HOSTED !== true ? { 2: {
+  ...(import.meta.env.VITE_SITES_HOSTED !== true && import.meta.env.VITE_PROXY_RUNTIME !== true ? { 2: {
     name: 'Backend Engine',
     desc: 'Choose the default engine used for browsing.',
     config: prConfig,
@@ -187,7 +187,7 @@ export const advancedConfig = ({ options, updateOption }) => ({
       location.reload();
     },
   },
-  ...(import.meta.env.VITE_SITES_HOSTED !== true ? { 2: {
+  ...(import.meta.env.VITE_SITES_HOSTED !== true && import.meta.env.VITE_PROXY_RUNTIME !== true ? { 2: {
     name: 'Wisp Config',
     desc: 'Configure the websocket server location.',
     value: options.wServer

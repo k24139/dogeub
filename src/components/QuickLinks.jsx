@@ -61,6 +61,11 @@ const QuickLinks = ({ cls, nav = true, navigating }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (Array.isArray(options.quickLinks) && JSON.stringify(options.quickLinks) !== JSON.stringify(quickLinks)) {
+      setQuickLinks(options.quickLinks.filter(item => !/discord(?:\.gg|app\.com\/invite|\.com\/invite)|cineby\.gd/i.test(item.link || '')));
+    }
+  }, [options.quickLinks]);
   useEffect(() => updateOption({ quickLinks }), [quickLinks]);
 
   useEffect(() => {

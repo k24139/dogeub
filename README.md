@@ -17,11 +17,15 @@ npm ci
 npm run dev
 ```
 
-Create a production build with `npm run build`. Run it with `node server.js`. The Node server supplies the Bare and Wisp services used by private browsing. Set `PORT` to change its listening port. The optional `BARE=false` setting disables the Bare endpoint. `MASQR=true` enables the optional Masqr access check. Set `MASQR_COOKIE_SECRET` to a long random value and configure `MASQR_LICENSE_SERVER_URL` when using it.
+Create a production build with `npm run build`. The legacy `node server.js` command binds to localhost by default for development. Use `backend/Dockerfile` for a public deployment with authentication and network restrictions. The Node server supplies the Bare and Wisp services used by private browsing. Set `PORT` to change its listening port. The optional `BARE=false` setting disables the Bare endpoint. `MASQR=true` enables the optional Masqr access check. Set `MASQR_COOKIE_SECRET` to a long random value and configure `MASQR_LICENSE_SERVER_URL` when using it.
 
 ## ChatGPT Sites
 
-ChatGPT Sites can host the static nutub interface, apps, games, bookmarks, and settings. Sites Workers do not provide the persistent Node process or raw TCP sockets required by nutub's Bare/Wisp private browser. The hosted build displays this limitation on the browsing page. Use the Node deployment above to run that feature.
+The main nutub app stays on ChatGPT Sites. Its Private Browser embeds the real browser runtime from a separate Node backend. That origin serves Ultraviolet/Scramjet service workers, runtime assets, and authenticated Wisp WebSockets. It keeps the original browser tabs, address bar, navigation, and refresh controls.
+
+Build the Sites shell with `SITES_HOSTED=true VITE_PROXY_BACKEND_URL=https://your-backend.example npm run build`. The endpoint is public configuration, not a password. Never place secrets in a `VITE_*` variable. The backend password belongs only in the hosting provider's private environment settings.
+
+See [Private Browser deployment and verification](docs/PRIVATE_BROWSER_DEPLOYMENT.md) for the Docker, Render, Railway, and VPS setup, security controls, test evidence, and pending live checks. Backend deployment and an actual HTTPS endpoint are required before browsing can work.
 
 The app catalog is bundled in `src/data/apps.json`, so builds do not fetch executable configuration from an external catalog server. The Node server provides DuckDuckGo autocomplete and proxies catalog artwork from nutub's existing asset host. Sites builds load that artwork directly from the same host. App and game destinations remain externally hosted and follow their own content and privacy policies.
 

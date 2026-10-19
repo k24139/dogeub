@@ -1,11 +1,4 @@
-const k = new TextEncoder().encode(
-  btoa(new Date().toISOString().slice(0, 10) + location.host)
-    .split('')
-    .reverse()
-    .join('')
-    // mango
-    .slice(6.7),
-);
+const k = new TextEncoder().encode('nutub-url-v1');
 
 export const mango = {
   enc: (s) => {
@@ -52,13 +45,7 @@ export const makecodec = () => ({
   encode: `(s) => {
     if (!s) return s;
     try {
-      const k = new TextEncoder().encode(
-        btoa(new Date().toISOString().slice(0, 10) + location.host)
-          .split('')
-          .reverse()
-          .join('')
-          .slice(6.7)
-      );
+      const k = new TextEncoder().encode('nutub-url-v1');
       const d = new TextEncoder().encode(s),
         o = new Uint8Array(d.length);
       for (let i = 0; i < d.length; i++) o[i] = d[i] ^ k[i % 8];
@@ -70,13 +57,7 @@ export const makecodec = () => ({
   decode: `(s) => {
     if (!s) return s;
     try {
-      const k = new TextEncoder().encode(
-        btoa(new Date().toISOString().slice(0, 10) + location.host)
-          .split('')
-          .reverse()
-          .join('')
-          .slice(6.7)
-      );
+      const k = new TextEncoder().encode('nutub-url-v1');
       const n =
         Math.min(
           s.indexOf('?') + 1 || s.length + 1,
