@@ -94,7 +94,7 @@ Verified locally on October 19, 2026:
 | Container image build | Not run, Docker unavailable. |
 | Live websites, target cookies, resource rendering, redirects and WebSocket echo through the actual Site | Not run, backend deployment/account connection required. |
 
-The browser runtime and Sites frontend are separate builds. The runtime build includes `/eggs`, `/libcurl`, `/baremux`, `/portal`, `/sw.js`, and `/s_sw.js`. Proxy initialization waits for service-worker activation before loading a URL. The codecs now use the same stable key, so encoded URLs do not change across dates or origins. The old error-page reload loop was removed.
+The browser runtime writes to `dist-browser`; the Sites frontend writes to `dist`. These separate output directories prevent one build from mixing artifacts into the other. The runtime build includes `/eggs`, `/libcurl`, `/baremux`, `/portal`, `/sw.js`, and `/s_sw.js`. Proxy initialization waits for service-worker activation before loading a URL. The codecs now use the same stable key, so encoded URLs do not change across dates or origins. The old error-page reload loop was removed.
 
 A Docker executable is not installed here, so the complete container image was not built locally. Managed browser QA is unavailable through the supported Sites preview workflow. The native HTTP/WebSocket checks run real local sockets, not a browser engine.
 

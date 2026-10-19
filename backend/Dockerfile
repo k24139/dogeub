@@ -11,7 +11,7 @@ WORKDIR /app
 COPY backend/package.json backend/package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 COPY --chown=node:node backend/*.mjs ./
-COPY --from=build --chown=node:node /app/dist ./public
+COPY --from=build --chown=node:node /app/dist-browser ./public
 COPY --chown=node:node LICENSE ./public/LICENSE
 USER node
 EXPOSE 8080

@@ -17,6 +17,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 const useBare = process.env.BARE === 'true';
 const sitesHosted = process.env.SITES_HOSTED === 'true';
+const buildDirectory = !sitesHosted && process.env.PROXY_RUNTIME === 'true' ? 'dist-browser' : 'dist';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 logging.set_level(logging.NONE);
@@ -77,7 +78,7 @@ function copyProxyAssets() {
     apply: 'build',
     async closeBundle() {
       if (sitesHosted) return;
-      const output = resolve(__dirname, 'dist');
+      const output = resolve(__dirname, buildDirectory);
       for (const target of targets) {
         const destination = resolve(output, target.destination);
         await mkdir(destination, { recursive: true });
@@ -131,6 +132,7 @@ export default defineConfig(({ command }) => {
       },
     ].filter(Boolean),
     build: {
+      outDir: buildDirectory,
       target: 'es2022',
       reportCompressedSize: false,
       esbuild: {

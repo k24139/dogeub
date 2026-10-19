@@ -29,3 +29,5 @@ tools
 .env
 package-lock.json
 backend/public
+
+dist-browser
