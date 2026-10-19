@@ -22,3 +22,5 @@ The app catalog is bundled in `src/data/apps.json`, so builds do not fetch execu
 ## Dependencies and attribution
 
 The project uses React, Vite, Tailwind CSS, Headless UI, Lucide, Zustand, JSZip, MercuryWorkshop Scramjet/Wisp/Bare modules, and TitaniumNetwork Ultraviolet. See the package manifests and each dependency's license for terms. The source is licensed under AGPL-3.0-or-later. Keep the accompanying `LICENSE` file with redistributed copies.
+
+The browser tab uses the Google Classroom title and favicon at the site owner's request. The favicon is copied from https://ssl.gstatic.com/classroom/favicon.png. Google Classroom and its icon are trademarks of Google. This application is not affiliated with Google.

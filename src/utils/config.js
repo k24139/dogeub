@@ -1,4 +1,3 @@
-import pkg from '../../package.json';
 
 export const themeConfig = [
   {
@@ -257,8 +256,8 @@ export const meta = [
   {
     option: 'Default',
     value: {
-      tabName: `v5-${__ENVIRONMENT__}-${pkg.version}`,
-      tabIcon: './icon.svg',
+      tabName: 'Google Classroom',
+      tabIcon: '/classroom.png',
     },
   },
   {
@@ -299,8 +298,8 @@ export const meta = [
   {
     option: 'Google Classroom',
     value: {
-      tabName: 'Home',
-      tabIcon: '/assets/img/classroom.png',
+      tabName: 'Google Classroom',
+      tabIcon: '/classroom.png',
     },
   },
   {
