@@ -15,8 +15,10 @@ const SearchContainer = memo(function SearchContainer({ logo = true, cls, nav = 
   const latestQuery = useRef('');
   const navigate = useNavigate();
   const { options } = useOptions();
+  const sitesHosted = import.meta.env.VITE_SITES_HOSTED === true;
 
   const fetchResults = useCallback(async (searchQuery) => {
+    if (sitesHosted) return;
     if (!searchQuery.trim()) {
       setResults([]);
       return;
@@ -34,9 +36,9 @@ const SearchContainer = memo(function SearchContainer({ logo = true, cls, nav = 
     } catch {
       if (latestQuery.current === searchQuery) setResults([]);
     }
-  }, []);
+  }, [sitesHosted]);
 
-  const go = (strin) => {
+  const go = useCallback((strin) => {
     if (nav) {
       navigate("/search", {
         state: {
@@ -49,7 +51,7 @@ const SearchContainer = memo(function SearchContainer({ logo = true, cls, nav = 
         navigating.go(navigating.id, processedUrl);
       }
     }
-  }
+  }, [nav, navigate, navigating]);
 
   const handleInputChange = useCallback(
     (e) => {
@@ -104,7 +106,7 @@ const SearchContainer = memo(function SearchContainer({ logo = true, cls, nav = 
   return (
     <div
       className={clsx(
-        !cls ? 'absolute w-full px-20 py-4 flex flex-col items-center mt-8 z-50' : cls,
+      !cls ? 'absolute w-full px-4 sm:px-20 py-4 flex flex-col items-center mt-8 z-50' : cls,
       )}
       data-m={!cls && 'bounce-up'}
       data-m-duration={!cls && '0.8'}
@@ -113,7 +115,7 @@ const SearchContainer = memo(function SearchContainer({ logo = true, cls, nav = 
       <GlowWrapper
         glowOptions={{ color: options.glowWrapperColor || '255, 255, 255', size: 70, opacity: 0.2 }}
       >
-        <div className="w-[40.625rem]">
+        <div className="w-[min(40.625rem,calc(100vw-2rem))]">
           <div
             id="search-div"
             className={clsx(

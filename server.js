@@ -17,13 +17,28 @@ const __dirname = dirname(__filename);
 
 const port = process.env.PORT || 2345;
 const server = createServer();
-const bare = process.env.BARE !== "false" ? createBareServer("/seal/") : null;
+const bare = process.env.BARE !== "false"
+  ? createBareServer("/seal/", {
+      blockLocal: true,
+      connectionLimiter: {
+        maxConnectionsPerIP: 10,
+        windowDuration: 60,
+        blockDuration: 60,
+      },
+    })
+  : null;
 logging.set_level(logging.NONE);
 
 Object.assign(wisp.options, {
   dns_method: "resolve",
   dns_servers: ["1.1.1.3", "1.0.0.3"],
-  dns_result_order: "ipv4first"
+  dns_result_order: "ipv4first",
+  allow_direct_ip: false,
+  allow_private_ips: false,
+  allow_loopback_ips: false,
+  allow_udp_streams: false,
+  stream_limit_per_host: 12,
+  stream_limit_total: 48,
 });
 
 server.on("upgrade", (req, sock, head) =>
@@ -57,13 +72,13 @@ app.register(fastifyStatic, {
   etag: true,
   lastModified: true,
   cacheControl: true,
-  setHeaders(res, path) {
+  setHeaders(reply, path) {
     if (path.endsWith(".html")) {
-      res.setHeader("Cache-Control", "no-cache, must-revalidate");
-    } else if (/\.[a-f0-9]{8,}\./.test(path)) {
-      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      reply.header("Cache-Control", "no-cache, must-revalidate");
+    } else if (/\.[A-Za-z0-9_-]{8,}\./.test(path)) {
+      reply.header("Cache-Control", "public, max-age=31536000, immutable");
     } else {
-      res.setHeader("Cache-Control", "public, max-age=3600");
+      reply.header("Cache-Control", "public, max-age=3600");
     }
   }
 });
@@ -106,8 +121,6 @@ const proxy = (url, type = "application/javascript") => async (req, reply) => {
 
 app.get("/assets/img/*", proxy(req => `https://dogeub-assets.pages.dev/img/${req.params["*"]}`, ""));
 app.get("/assets-fb/*", proxy(req => `https://dogeub-assets.pages.dev/img/server/${req.params["*"]}`, ""));
-app.get("/js/script.js", proxy(() => "https://byod.privatedns.org/js/script.js"));
-app.get("/ds", (req, res) => res.redirect("https://discord.gg/ZBef7HnAeg"));
 app.get("/return", async (req, reply) =>
   req.query?.q
     ? fetch(`https://duckduckgo.com/ac/?q=${encodeURIComponent(req.query.q)}`)

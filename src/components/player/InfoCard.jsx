@@ -1,5 +1,6 @@
 import theming from '/src/styles/theming.module.css';
 import clsx from 'clsx';
+import { getAssetUrl } from '/src/utils/assetUrl';
 import { useOptions } from '/src/utils/optionsContext';
 
 const InfoCard = ({ app, theme }) => {
@@ -15,7 +16,7 @@ const InfoCard = ({ app, theme }) => {
       )}
     >
       <img 
-        src={app?.icon} 
+        src={getAssetUrl(app?.icon)}
         className={clsx('rounded-md object-cover', shrinkHeader ? 'w-8 h-8' : 'w-12 h-12')} 
       />
       <div 

@@ -32,8 +32,6 @@ const baseConfigs = [
       'nav bar',
       'navbar',
       'size',
-      'donate',
-      'donation',
       'tabs bar',
       'tab bar',
     ],

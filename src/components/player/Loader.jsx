@@ -7,7 +7,6 @@ import {
   ZoomOut,
   Cloud,
   HardDrive,
-  Bug,
 } from 'lucide-react';
 import { useLocalGmLoader } from '/src/utils/hooks/player/useLocalGmLoader';
 import { useNavigate } from 'react-router-dom';
@@ -109,15 +108,6 @@ const Loader = ({ theme, app }) => {
           <Control icon={SquareArrowOutUpRight} fn={external} />
         )}
 
-        <Control
-          icon={Bug}
-          fn={() =>
-            window.open('https://forms.gle/JnvtauV7vX5trxAy8', '_blank', 'noopener noreferrer')
-          }
-          className="ml-auto"
-        >
-          Report Issue
-        </Control>
         <Control icon={ZoomIn} fn={() => handleZoom('in')} />
         <Control icon={ZoomOut} fn={() => handleZoom('out')} />
         <Control icon={Maximize2} fn={fs} />

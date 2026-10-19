@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
-import { BareMuxConnection } from 'bare-mux-fork';
 import { useOptions } from '/src/utils/optionsContext';
-import { makecodec } from './of';
 
 export default function useReg() {
   const { options } = useOptions();
+  const sitesHosted = import.meta.env.VITE_SITES_HOSTED === true;
   const defaultWs = `${location.protocol == 'http:' ? 'ws:' : 'wss:'}//${location.host}/wisp/`;
   const sws = [
     { path: new URL('/sw.js', location.origin).href, scope: new URL('/portal/k12/', location.origin).href },
@@ -13,6 +12,11 @@ export default function useReg() {
 
   useEffect(() => {
     const init = async () => {
+      if (sitesHosted) return;
+      const [{ BareMuxConnection }, { makecodec }] = await Promise.all([
+        import('bare-mux-fork'),
+        import('./of'),
+      ]);
       if (!window.scr) {
         const script = document.createElement('script');
         script.src = '/eggs/scramjet.all.js';

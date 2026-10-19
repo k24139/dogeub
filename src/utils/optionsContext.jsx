@@ -4,7 +4,11 @@ const OptionsContext = createContext();
 
 const getStoredOptions = () => {
   try {
-    return JSON.parse(localStorage.getItem('options') || '{}');
+    const stored = JSON.parse(localStorage.getItem('options') || '{}');
+    delete stored.adKey;
+    delete stored.adKeyInput;
+    delete stored.donationBtn;
+    return stored;
   } catch {
     return {};
   }

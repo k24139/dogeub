@@ -5,6 +5,7 @@ import { Plus, Bolt, Globe, Pencil, Trash2, CircleX } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import LinkDialog from './NewQuickLink';
 import EditLinkDialog from './EditQuickLink';
+import { getAssetUrl } from '/src/utils/assetUrl';
 
 const QuickLinks = ({ cls, nav = true, navigating }) => {
   const { options, updateOption } = useOptions();
@@ -17,14 +18,15 @@ const QuickLinks = ({ cls, nav = true, navigating }) => {
 
   const defaultLinks = [
     { link: 'https://google.com', icon: 'https://google.com/favicon.ico', name: 'Google' },
-    { link: 'https://cineby.gd', icon: '/assets/img/fyhn.ico', name: 'Movies' },
-    { link: 'https://discord.com', icon: '/assets/img/dsci.ico', name: 'Discord' },
     { link: 'https://github.com', icon: '/assets/img/icogh.ico', name: 'GitHub' },
   ];
 
   const [quickLinks, setQuickLinks] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('options'))?.quickLinks || defaultLinks;
+      const saved = JSON.parse(localStorage.getItem('options'))?.quickLinks;
+      return Array.isArray(saved)
+        ? saved.filter((item) => !/discord(?:\.gg|app\.com\/invite|\.com\/invite)|cineby\.gd/i.test(item.link || ''))
+        : defaultLinks;
     } catch {
       return defaultLinks;
     }
@@ -116,7 +118,7 @@ const QuickLinks = ({ cls, nav = true, navigating }) => {
             ) : (
               <img
                 key={link.icon}
-                src={link.icon}
+                src={getAssetUrl(link.icon)}
                 alt={link.name}
                 className="w-7 h-7 object-contain"
                 loading="lazy"

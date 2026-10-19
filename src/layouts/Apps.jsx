@@ -7,6 +7,7 @@ import Pagination from '../components/Pagination';
 import styles from '../styles/apps.module.css';
 import theme from '../styles/theming.module.css';
 import clsx from 'clsx';
+import { getAssetUrl } from '/src/utils/assetUrl';
 
 const SORT_OPTIONS = [
   { value: 'categorical', label: 'Categorical' },
@@ -36,7 +37,7 @@ const AppCard = memo(({ app, onClick, fallbackMap, onImgError, itemTheme, itemSt
           <LayoutGrid className="w-full h-full" />
         ) : (
           <img
-            src={app.icon}
+            src={getAssetUrl(app.icon)}
             draggable="false"
             loading="lazy"
             className="w-full h-full object-cover"

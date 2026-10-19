@@ -1,105 +1,24 @@
-<div align="center">
-  
-  <img src="https://github.com/DogeNetwork/dogeub/blob/main/public/logo.svg" width="322" />
-  <br />
+# DogeUB
 
-  [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I81MF4CH) ![](https://dcbadge.limes.pink/api/server/https://discord.gg/unblocking?compact=true)
+DogeUB is a customizable hub for apps, games, bookmarks, and browser tools. The interface includes searchable app and game catalogs, saved links, appearance settings, and a private browsing view for self-hosted deployments.
 
-  
-</div>
+## Development
 
-# 
-
-A versatile, "internet hub"; The point of this project is to eliminate the need to search multiple websites for different things by packing together tools, apps, as well as entertainment and private browsing, all in one place. This is particularly useful for people who are lazy and want a "hub" that includes everything that they need to enjoy the internet.
-
-
-Many of our tools, apps, entertainment, etc. is requested through our Discord community or added through pull requests. We recommend making PRs to help out and contribute!
-
-
-> [!CAUTION]
-> Although this is an "internet hub", we do **not** include illegal, piracy, or copyright-infringing tools or apps.
-
-> ⭐ Star this repository if you are forking it, or find it useful!
-
----
-
-### Development & Building
-
-dogeub can be easily deployed as a web application. Use the commands below to run it for production, or for developing.
-
-> [!WARNING]
-> This project will **not work on Vercel**. dogeub runs a custom Node server while Vercel only supports serverless functions & does not allow persistent Node servers.
-
-#### Production:
-```bash
-git clone https://github.com/xorynix/dogeub.git
-cd dogeub
-npm i
-npm run build
-node server.js
-```
-
-#### Development:
+Requirements: Node.js 20 or newer and npm.
 
 ```bash
-git clone https://github.com/xorynix/dogeub.git
-cd dogeub
-npm i
+npm ci
 npm run dev
 ```
----
 
-#### Deploying with Docker:
+Create a production build with `npm run build`. Run it with `node server.js`. The Node server supplies the Bare and Wisp services used by private browsing. Set `PORT` to change its listening port. The optional `BARE=false` setting disables the Bare endpoint. `MASQR=true` enables the optional Masqr access check. Set `MASQR_COOKIE_SECRET` to a long random value and configure `MASQR_LICENSE_SERVER_URL` when using it.
 
-```bash
-docker run -d \
-  --name dogeub \
-  --restart unless-stopped \
-  -p 3000:3000 \
-  -e NODE_ENV=production \
-  -e PORT=3000 \
-  ghcr.io/xorynix/dogeub:latest
-```
+## ChatGPT Sites
 
-> [!NOTE]
-> If accessing over a network instead of localhost, you will need to provide a valid SSL certificate (e.g., using a reverse proxy like Nginx or Caddy). This is required for the built-in service worker to function properly.
+ChatGPT Sites can host the static DogeUB interface, apps, games, bookmarks, and settings. Sites Workers do not provide the persistent Node process or raw TCP sockets required by DogeUB's Bare/Wisp private browser. The hosted build displays this limitation on the browsing page. Use the Node deployment above to run that feature.
 
----
+The app catalog is bundled in `src/data/apps.json`, so builds do not fetch executable configuration from an external catalog server. The Node server provides DuckDuckGo autocomplete and proxies catalog artwork from DogeUB's existing asset host. Sites builds load that artwork directly from the same host. App and game destinations remain externally hosted and follow their own content and privacy policies.
 
-### Contributors / Developers
+## Dependencies and attribution
 
-[![Contributors](https://contrib.rocks/image?repo=xorynix/dogeub)](https://github.com/xorynix/dogeub/graphs/contributors)
-
-> Want to be on this list? Contribute to this project!
-
----
-
-
-
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=xorynix%2Fdogeub&type=timeline&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=xorynix/dogeub&type=timeline&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=xorynix/dogeub&type=timeline&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=xorynix/dogeub&type=timeline&legend=top-left" />
- </picture>
-</a>
-
-
-
-
-Thanks to these libraries for making the project possible:
-
-- [MercuryWorkshop/wisp-server-node](https://github.com/MercuryWorkshop/wisp-server-node)
-- [MercuryWorkshop/scramjet](https://github.com/MercuryWorkshop/scramjet)
-- [titaniumnetwork-dev/Ultraviolet](https://github.com/titaniumnetwork-dev/Ultraviolet)
-- [lucide-icons/lucide](https://github.com/lucide-icons/lucide)
-- [pmndrs/zustand](https://github.com/pmndrs/zustand)
-- [Stuk/jszip](https://github.com/Stuk/jszip)
-  
-## License
-
-This project is licensed under the **AGPLv3** license.
-See the [LICENSE](LICENSE) file for more details.
+The project uses React, Vite, Tailwind CSS, Headless UI, Lucide, Zustand, JSZip, MercuryWorkshop Scramjet/Wisp/Bare modules, and TitaniumNetwork Ultraviolet. See the package manifests and each dependency's license for terms. The source is licensed under AGPL-3.0-or-later. Keep the accompanying `LICENSE` file with redistributed copies.
