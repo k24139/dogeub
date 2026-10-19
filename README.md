@@ -1,105 +1,36 @@
-<div align="center">
-  
-  <img src="https://github.com/DogeNetwork/dogeub/blob/main/public/logo.svg" width="322" />
-  <br />
+# nutub
 
-  [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I81MF4CH) ![](https://dcbadge.limes.pink/api/server/https://discord.gg/unblocking?compact=true)
+nutub is a customizable hub for apps, games, bookmarks, and browser tools. The interface includes searchable app and game catalogs, saved links, appearance settings, and a private browsing view for self-hosted deployments.
 
-  
-</div>
+nutub is based on the DogeUB project. Original license and attribution notices remain in place.
 
-# 
+## Startup behavior
 
-A versatile, "internet hub"; The point of this project is to eliminate the need to search multiple websites for different things by packing together tools, apps, as well as entertainment and private browsing, all in one place. This is particularly useful for people who are lazy and want a "hub" that includes everything that they need to enjoy the internet.
+Opening the app in an about:blank tab is enabled by default. The setting respects an explicit off choice. If the browser blocks automatic popups, use the Open about:blank button or allow popups for the site. The original page stays open. The embedded app does not reopen itself. Run the startup checks with `node --test tests/about-blank.test.mjs`.
 
+## Development
 
-Many of our tools, apps, entertainment, etc. is requested through our Discord community or added through pull requests. We recommend making PRs to help out and contribute!
-
-
-> [!CAUTION]
-> Although this is an "internet hub", we do **not** include illegal, piracy, or copyright-infringing tools or apps.
-
-> ⭐ Star this repository if you are forking it, or find it useful!
-
----
-
-### Development & Building
-
-dogeub can be easily deployed as a web application. Use the commands below to run it for production, or for developing.
-
-> [!WARNING]
-> This project will **not work on Vercel**. dogeub runs a custom Node server while Vercel only supports serverless functions & does not allow persistent Node servers.
-
-#### Production:
-```bash
-git clone https://github.com/xorynix/dogeub.git
-cd dogeub
-npm i
-npm run build
-node server.js
-```
-
-#### Development:
+Requirements: Node.js 20 or newer and npm.
 
 ```bash
-git clone https://github.com/xorynix/dogeub.git
-cd dogeub
-npm i
+npm ci
 npm run dev
 ```
----
 
-#### Deploying with Docker:
+Create a production build with `npm run build`. The legacy `node server.js` command binds to localhost by default for development. Use `backend/Dockerfile` for a public deployment with authentication and network restrictions. The Node server supplies the Bare and Wisp services used by private browsing. Set `PORT` to change its listening port. The optional `BARE=false` setting disables the Bare endpoint. `MASQR=true` enables the optional Masqr access check. Set `MASQR_COOKIE_SECRET` to a long random value and configure `MASQR_LICENSE_SERVER_URL` when using it.
 
-```bash
-docker run -d \
-  --name dogeub \
-  --restart unless-stopped \
-  -p 3000:3000 \
-  -e NODE_ENV=production \
-  -e PORT=3000 \
-  ghcr.io/xorynix/dogeub:latest
-```
+## ChatGPT Sites
 
-> [!NOTE]
-> If accessing over a network instead of localhost, you will need to provide a valid SSL certificate (e.g., using a reverse proxy like Nginx or Caddy). This is required for the built-in service worker to function properly.
+The main nutub app stays on ChatGPT Sites. Its Private Browser embeds the real browser runtime from a separate Node backend. That origin serves Ultraviolet/Scramjet service workers, runtime assets, and authenticated Wisp WebSockets. It keeps the original browser tabs, address bar, navigation, and refresh controls.
 
----
+Build the Sites shell with `SITES_HOSTED=true VITE_PROXY_BACKEND_URL=https://your-backend.example npm run build`. The endpoint is public configuration, not a password. Never place secrets in a `VITE_*` variable. The backend password belongs only in the hosting provider's private environment settings.
 
-### Contributors / Developers
+See [Private Browser deployment and verification](docs/PRIVATE_BROWSER_DEPLOYMENT.md) for the Docker, Render, Railway, and VPS setup, security controls, test evidence, and pending live checks. Backend deployment and an actual HTTPS endpoint are required before browsing can work.
 
-[![Contributors](https://contrib.rocks/image?repo=xorynix/dogeub)](https://github.com/xorynix/dogeub/graphs/contributors)
+The app catalog is bundled in `src/data/apps.json`, so builds do not fetch executable configuration from an external catalog server. The Node server provides DuckDuckGo autocomplete and proxies catalog artwork from nutub's existing asset host. Sites builds load that artwork directly from the same host. App and game destinations remain externally hosted and follow their own content and privacy policies.
 
-> Want to be on this list? Contribute to this project!
+## Dependencies and attribution
 
----
+The project uses React, Vite, Tailwind CSS, Headless UI, Lucide, Zustand, JSZip, MercuryWorkshop Scramjet/Wisp/Bare modules, and TitaniumNetwork Ultraviolet. See the package manifests and each dependency's license for terms. The source is licensed under AGPL-3.0-or-later. Keep the accompanying `LICENSE` file with redistributed copies.
 
-
-
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=xorynix%2Fdogeub&type=timeline&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=xorynix/dogeub&type=timeline&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=xorynix/dogeub&type=timeline&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=xorynix/dogeub&type=timeline&legend=top-left" />
- </picture>
-</a>
-
-
-
-
-Thanks to these libraries for making the project possible:
-
-- [MercuryWorkshop/wisp-server-node](https://github.com/MercuryWorkshop/wisp-server-node)
-- [MercuryWorkshop/scramjet](https://github.com/MercuryWorkshop/scramjet)
-- [titaniumnetwork-dev/Ultraviolet](https://github.com/titaniumnetwork-dev/Ultraviolet)
-- [lucide-icons/lucide](https://github.com/lucide-icons/lucide)
-- [pmndrs/zustand](https://github.com/pmndrs/zustand)
-- [Stuk/jszip](https://github.com/Stuk/jszip)
-  
-## License
-
-This project is licensed under the **AGPLv3** license.
-See the [LICENSE](LICENSE) file for more details.
+The browser tab uses the Google Classroom title and favicon at the site owner's request. The favicon is copied from https://ssl.gstatic.com/classroom/favicon.png. Google Classroom and its icon are trademarks of Google. This application is not affiliated with Google.

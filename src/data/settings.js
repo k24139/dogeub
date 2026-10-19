@@ -77,10 +77,8 @@ export const privacyConfig = ({ options, updateOption, openPanic }) => {
 
   config[5] = {
     name: 'Open about:blank on startup',
-    desc: 'When enabled, the about:blank tab opens automatically when you visit.',
-    value:
-      options.aboutBlankAutoOpen === true ||
-      (options.aboutBlank && options.aboutBlankAutoOpen !== false),
+    desc: 'On by default. Opens the app in an about:blank tab. Browsers that block automatic popups require a click.',
+    value: options.aboutBlankAutoOpen !== false,
     type: 'switch',
     action: (b) => setTimeout(() => updateOption({ aboutBlankAutoOpen: b }), 100),
   };
@@ -104,7 +102,7 @@ export const privacyConfig = ({ options, updateOption, openPanic }) => {
     value: 'Set Key',
     type: 'button',
     action: openPanic,
-    disabled: !!!options.panicToggleEnabled,
+    disabled: !options.panicToggleEnabled,
   };
 
   return config;
@@ -151,13 +149,6 @@ export const customizeConfig = ({ options, updateOption }) => ({
     action: (b) => setTimeout(() => updateOption({ showTb: b }), 100),
   },
   6: {
-    name: 'Donation button',
-    desc: 'Toggle whether you want the "Support us" button to show.',
-    value: options.donationBtn ?? true,
-    type: 'switch',
-    action: (b) => setTimeout(() => updateOption({ donationBtn: b }), 100),
-  },
-  7: {
     name: 'Compact App Header',
     desc: 'Shrink the app/game header to a single line.',
     value: options.shrinkHeader ?? false,
@@ -175,14 +166,14 @@ export const browsingConfig = ({ options, updateOption }) => ({
     type: 'select',
     action: (a) => updateOption(a),
   },
-  2: {
+  ...(import.meta.env.VITE_SITES_HOSTED !== true && import.meta.env.VITE_PROXY_RUNTIME !== true ? { 2: {
     name: 'Backend Engine',
     desc: 'Choose the default engine used for browsing.',
     config: prConfig,
     value: find(prConfig, (c) => c.value?.prType === options.prType, 0),
     type: 'select',
     action: (a) => updateOption(a),
-  },
+  } } : {}),
 });
 
 export const advancedConfig = ({ options, updateOption }) => ({
@@ -196,7 +187,7 @@ export const advancedConfig = ({ options, updateOption }) => ({
       location.reload();
     },
   },
-  2: {
+  ...(import.meta.env.VITE_SITES_HOSTED !== true && import.meta.env.VITE_PROXY_RUNTIME !== true ? { 2: {
     name: 'Wisp Config',
     desc: 'Configure the websocket server location.',
     value: options.wServer
@@ -204,19 +195,7 @@ export const advancedConfig = ({ options, updateOption }) => ({
       : `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/wisp/`,
     type: 'input',
     action: (b) => updateOption({ wServer: b || null }),
-  },
-  ...(POPUNDER_ENABLED === 'true'
-    ? {
-        3: {
-          name: 'Disable Ads',
-          desc: 'Enter a key to disable all ads. Given to Premium Supporters & Beta Testers.',
-          value: options.adKeyInput || options.adKey || '',
-          type: 'input',
-          inputValidation: 'adKey',
-          action: (b) => updateOption({ adKeyInput: b?.trim() || null }),
-        },
-      }
-    : {}),
+  } } : {}),
   4: {
     name: 'Export Settings',
     desc: 'Download your current settings as a JSON file.',

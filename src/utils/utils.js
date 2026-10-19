@@ -1,3 +1,5 @@
+import { openAboutBlankPopup, shouldOpenAboutBlank } from './aboutBlank.js';
+export { openAboutBlankPopup } from './aboutBlank.js';
 import pkg from '../../package.json';
 let blur, focus, panicListener;
 
@@ -70,56 +72,18 @@ export const panic = () => {
   }
 };
 
-/* about:blank logic */
-export const openAboutBlankPopup = (redirectCurrentTab = true) => {
-  const w = open('about:blank');
-  if (!w || w.closed) {
-    alert('Popup was blocked. Allow popups for this site and try again.');
-    return false;
-  }
-  const win = w.window;
-  const d = win.document;
-  const f = d.createElement('iframe');
-
-  Object.assign(f, { src: location.href });
-  Object.assign(f.style, { width: '100%', height: '100%', border: 'none' });
-  Object.assign(d.body.style, { margin: 0, height: '100vh' });
-  d.documentElement.style.height = '100%';
-  d.head.appendChild(Object.assign(document.createElement('link'), { rel: 'icon', href: '' }));
-  d.body.append(f);
-  const s = d.createElement('script');
-  s.textContent = `
-    const d = document;
-    setInterval(() => {
-      const op = JSON.parse(localStorage.getItem('options') || '{}');
-      d.title = op.tabName || '';
-      let icon = d.querySelector("link[rel~='icon']");
-      if (!icon) {
-        icon = d.createElement('link');
-        icon.rel = 'icon';
-        d.head.appendChild(icon);
-      }
-      icon.href = op.tabIcon || '';
-    }, 800);
-  `;
-  d.head.appendChild(s);
-  if (redirectCurrentTab) window.location.replace('https://google.com');
-  return true;
-};
-
 export const check = (() => {
   const op = JSON.parse(localStorage.options || '{}');
-  !op.version && localStorage.setItem('options', JSON.stringify({ version: pkg.version }));
+  !op.version && localStorage.setItem('options', JSON.stringify({ ...op, version: pkg.version }));
   if (op.beforeUnload) {
     window.addEventListener('beforeunload', (e) => {
       e.preventDefault();
       e.returnValue = '';
     });
   }
-  const openOnStartup =
-    op.aboutBlankAutoOpen === true || (op.aboutBlank && op.aboutBlankAutoOpen !== false);
+  const openOnStartup = shouldOpenAboutBlank(op);
   if (window.top === window.self && openOnStartup) {
-    openAboutBlankPopup(true);
+    openAboutBlankPopup();
   }
 
   ckOff();

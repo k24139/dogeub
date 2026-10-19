@@ -1,4 +1,4 @@
-const k = new TextEncoder().encode(btoa(new Date().toISOString().slice(0, 10) + location.host).split('').reverse().join('').slice(6.7));
+const k = new TextEncoder().encode('nutub-url-v1');
 const cfg = "/portal/uv.config.js";
 const pfx = "/portal/k12/";
 const trim = s => !s || s === "/" ? "" : s.replace(/\/$/, "");

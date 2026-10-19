@@ -1,0 +1,9 @@
+{
+  "name": "nutub-browser-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": { "start": "node server.mjs", "test": "node --test test/*.test.mjs" },
+  "dependencies": { "@mercuryworkshop/wisp-js": "0.3.3", "ipaddr.js": "2.3.0", "ws": "8.22.0" }
+}

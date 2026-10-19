@@ -1,9 +1,10 @@
-import { defineConfig, normalizePath } from 'vite';
+import { defineConfig } from 'vite';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { cp, copyFile, mkdir } from 'node:fs/promises';
+import process from 'node:process';
 import react from '@vitejs/plugin-react-swc';
 import vitePluginBundleObfuscator from 'vite-plugin-bundle-obfuscator';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { logging, server as wisp } from '@mercuryworkshop/wisp-js/server';
 import { createBareServer } from '@tomphttp/bare-server-node';
 import { bareModulePath } from '@mercuryworkshop/bare-as-module3';
@@ -15,31 +16,12 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 const useBare = process.env.BARE === 'true';
+const sitesHosted = process.env.SITES_HOSTED === 'true';
+const buildDirectory = !sitesHosted && process.env.PROXY_RUNTIME === 'true' ? 'dist-browser' : 'dist';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 logging.set_level(logging.NONE);
 let bare;
-
-async function remoteApps(urls = ['https://ci.baylib.top/apps.json?t=' + Date.now()]) {
-  const list = Array.isArray(urls) ? urls : [urls];
-  let lastErr;
-
-  for (const u of list) {
-    try {
-      const res = await fetch(u, { cache: 'no-store' });
-
-      if (!res.ok) {
-        throw new Error(`apps.json ${res.status}`);
-      }
-
-      return JSON.stringify(await res.json());
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-
-  throw lastErr || new Error('apps.json unavailable');
-}
 
 Object.assign(wisp.options, {
   dns_method: 'resolve',
@@ -78,6 +60,42 @@ const obf = {
   },
 };
 
+function copyProxyAssets() {
+  const targets = [
+    { source: libcurlPath, destination: 'libcurl' },
+    { source: baremuxPath, destination: 'baremux' },
+    { source: scramjetPath, destination: 'eggs' },
+    ...(useBare ? [{ source: bareModulePath, destination: 'baremod' }] : []),
+    {
+      source: uvPath,
+      destination: 'portal',
+      files: ['uv.handler.js', 'uv.client.js', 'uv.bundle.js', 'uv.sw.js'],
+    },
+  ];
+
+  return {
+    name: 'copy-proxy-assets',
+    apply: 'build',
+    async closeBundle() {
+      if (sitesHosted) return;
+      const output = resolve(__dirname, buildDirectory);
+      for (const target of targets) {
+        const destination = resolve(output, target.destination);
+        await mkdir(destination, { recursive: true });
+        if (target.files) {
+          await Promise.all(
+            target.files.map((name) =>
+              copyFile(resolve(target.source, name), resolve(destination, name)),
+            ),
+          );
+        } else {
+          await cp(target.source, destination, { recursive: true, force: true });
+        }
+      }
+    },
+  };
+}
+
 export default defineConfig(({ command }) => {
   const environment = command === 'serve' ? 'dev' : 'stable';
 
@@ -86,23 +104,7 @@ export default defineConfig(({ command }) => {
     plugins: [
       react(),
       vitePluginBundleObfuscator(obf),
-      viteStaticCopy({
-        targets: [
-          { src: [normalizePath(resolve(libcurlPath, '*'))], dest: 'libcurl' },
-          { src: [normalizePath(resolve(baremuxPath, '*'))], dest: 'baremux' },
-          { src: [normalizePath(resolve(scramjetPath, '*'))], dest: 'eggs' },
-          useBare && { src: [normalizePath(resolve(bareModulePath, '*'))], dest: 'baremod' },
-          {
-            src: [
-              normalizePath(resolve(uvPath, 'uv.handler.js')),
-              normalizePath(resolve(uvPath, 'uv.client.js')),
-              normalizePath(resolve(uvPath, 'uv.bundle.js')),
-              normalizePath(resolve(uvPath, 'uv.sw.js')),
-            ],
-            dest: 'portal',
-          },
-        ].filter(Boolean),
-      }),
+      copyProxyAssets(),
       {
         name: 'server',
         apply: 'serve',
@@ -128,36 +130,9 @@ export default defineConfig(({ command }) => {
           });
         },
       },
-      {
-        name: 'redirect',
-        apply: 'serve',
-        configureServer(server) {
-          server.middlewares.use((req, res, next) => {
-            if (req.url === '/ds') {
-              res.writeHead(302, { Location: 'https://discord.gg/ZBef7HnAeg' });
-              res.end();
-            } else {
-              next();
-            }
-          });
-        },
-      },
-      {
-        name: 'remote-apps-json',
-        apply: 'build',
-        async load(id) {
-          const cleanId = normalizePath(id).split('?')[0];
-
-          if (!cleanId.endsWith('/src/data/apps.json')) {
-            return null;
-          }
-
-          return remoteApps();
-        },
-      },
-
     ].filter(Boolean),
     build: {
+      outDir: buildDirectory,
       target: 'es2022',
       reportCompressedSize: false,
       esbuild: {
@@ -179,7 +154,6 @@ export default defineConfig(({ command }) => {
             if (/react-router|react-dom|react\b/.test(pkg)) return 'react';
             if (/^@mui\//.test(pkg) || /^@emotion\//.test(pkg)) return 'mui';
             if (/lucide/.test(pkg)) return 'icons';
-            if (/react-ga4/.test(pkg)) return 'analytics';
             if (/nprogress/.test(pkg)) return 'progress';
             return 'vendor';
           },
@@ -193,9 +167,7 @@ export default defineConfig(({ command }) => {
     },
     css: {
       modules: {
-        generateScopedName: () =>
-          String.fromCharCode(97 + Math.floor(Math.random() * 17)) +
-          Math.random().toString(36).substring(2, 8),
+        generateScopedName: '[name]__[local]___[hash:base64:5]',
       },
     },
     server: {
@@ -214,8 +186,8 @@ export default defineConfig(({ command }) => {
     },
     define: {
       __ENVIRONMENT__: JSON.stringify(environment),
-      POPUNDER_ENABLED: JSON.stringify(process.env.POPUNDER_ENABLED),
-      POPUNDER_URL: JSON.stringify(process.env.POPUNDER_URL),
+      'import.meta.env.VITE_SITES_HOSTED': process.env.SITES_HOSTED === 'true',
+      'import.meta.env.VITE_PROXY_RUNTIME': process.env.PROXY_RUNTIME === 'true',
     },
   };
 });

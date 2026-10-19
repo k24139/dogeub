@@ -4,7 +4,11 @@ const OptionsContext = createContext();
 
 const getStoredOptions = () => {
   try {
-    return JSON.parse(localStorage.getItem('options') || '{}');
+    const stored = JSON.parse(localStorage.getItem('options') || '{}');
+    delete stored.adKey;
+    delete stored.adKeyInput;
+    delete stored.donationBtn;
+    return stored;
   } catch {
     return {};
   }
@@ -24,6 +28,7 @@ export const OptionsProvider = ({ children }) => {
 
     const current = getStoredOptions();
     const updated = { ...current, ...obj };
+    if (import.meta.env.VITE_PROXY_RUNTIME === true) window.dispatchEvent(new CustomEvent('nutub:options', {detail:obj}));
 
     try {
       localStorage.setItem('options', JSON.stringify(updated));

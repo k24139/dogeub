@@ -1,69 +1,61 @@
-import { useEffect } from 'react';
-import { BareMuxConnection } from 'bare-mux-fork';
+import { useEffect, useState } from 'react';
 import { useOptions } from '/src/utils/optionsContext';
-import { makecodec } from './of';
 
+let initialization;
+let transportUrl;
+async function initialize(wisp) {
+  const [{ BareMuxConnection }, { makecodec }] = await Promise.all([
+    import('bare-mux-fork'), import('./of'),
+  ]);
+  if (!window.scr) {
+    if (!window.$scramjetLoadController) {
+      const script = document.createElement('script');
+      script.src = '/eggs/scramjet.all.js';
+      await new Promise((resolve, reject) => {
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('Could not load the Scramjet runtime'));
+        document.head.appendChild(script);
+      });
+    }
+    const { ScramjetController } = window.$scramjetLoadController();
+    window.scr = new ScramjetController({
+      prefix:'/ham/', files:{wasm:'/eggs/scramjet.wasm.wasm',all:'/eggs/scramjet.all.js',sync:'/eggs/scramjet.sync.js'},
+      flags:{rewriterLogs:false,scramitize:false,cleanErrors:true,sourcemaps:false}, codec:makecodec(),
+    });
+    await window.scr.init();
+  }
+  if (!navigator.serviceWorker) throw new Error('Service workers are unavailable in this browser context');
+  for (const [path, scope] of [['/sw.js','/portal/k12/'],['/s_sw.js','/ham/']]) {
+    const registration = await navigator.serviceWorker.register(path,{scope});
+    const worker = registration.installing || registration.waiting || registration.active;
+    if (worker?.state !== 'activated') await new Promise((resolve,reject) => {
+      const timer = setTimeout(() => reject(new Error('Proxy service worker activation timed out')),15000);
+      worker.addEventListener('statechange', () => {
+        if (worker.state === 'activated') { clearTimeout(timer); resolve(); }
+        else if (worker.state === 'redundant') { clearTimeout(timer); reject(new Error('Proxy service worker failed')); }
+      });
+    });
+  }
+  const connection = new BareMuxConnection(new URL('/baremux/worker.js',location.origin).href);
+  await connection.setTransport('/libcurl/index.mjs',[{websocket:wisp,connections:[36,24,6]}]);
+}
 export default function useReg() {
   const { options } = useOptions();
-  const defaultWs = `${location.protocol == 'http:' ? 'ws:' : 'wss:'}//${location.host}/wisp/`;
-  const sws = [
-    { path: new URL('/sw.js', location.origin).href, scope: new URL('/portal/k12/', location.origin).href },
-    { path: new URL('/s_sw.js', location.origin).href, scope: new URL('/ham/', location.origin).href }
-  ];
-
+  const hosted = import.meta.env.VITE_SITES_HOSTED === true;
+  const runtime = import.meta.env.VITE_PROXY_RUNTIME === true;
+  const wisp = (!runtime && options.wServer) || `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/wisp/`;
+  const [state,setState] = useState({ready:false,error:null});
   useEffect(() => {
-    const init = async () => {
-      if (!window.scr) {
-        const script = document.createElement('script');
-        script.src = '/eggs/scramjet.all.js';
-        await new Promise((resolve, reject) => {
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
-
-      const { ScramjetController } = $scramjetLoadController();
-
-      const hamPrefix = '/ham/';
-      const eggsPath = '/eggs/';
-
-      window.scr = new ScramjetController({
-        prefix: hamPrefix,
-        files: {
-          wasm: eggsPath + 'scramjet.wasm.wasm',
-          all: eggsPath + 'scramjet.all.js',
-          sync: eggsPath + 'scramjet.sync.js',
-        },
-        flags: { rewriterLogs: false, scramitize: false, cleanErrors: true, sourcemaps: true },
-        codec: makecodec()
-      });
-
-      window.scr.init();
-
-      for (const sw of sws) {
-        try {
-          await navigator.serviceWorker.register(
-            sw.path,
-            sw.scope ? { scope: sw.scope } : undefined,
-          );
-        } catch (err) {
-          console.warn(`SW reg err (${sw.path}):`, err);
-        }
-      }
-
-      const baremuxPath = new URL('/baremux/worker.js', location.origin).href;
-      const connection = new BareMuxConnection(baremuxPath);
-
-      const libcurlPath = '/libcurl/index.mjs';
-      const wisp = options.wServer || defaultWs;
-      await connection.setTransport(libcurlPath, [
-        {
-          wisp: wisp,
-        },
-      ]);
-    };
-
-    init();
-  }, [options.wServer]);
+    if (hosted) return;
+    let active = true;
+    setState({ready:false,error:null});
+    if (!initialization || transportUrl !== wisp) {
+      transportUrl = wisp;
+      initialization = initialize(wisp);
+    }
+    initialization.then(() => { if (active) setState({ready:true,error:null}); })
+      .catch(error => { if (active) setState({ready:false,error}); });
+    return () => { active = false; };
+  }, [hosted,wisp]);
+  return state;
 }

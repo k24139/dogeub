@@ -1,5 +1,5 @@
 {
-  "name": "v5-react-2",
+  "name": "dogeub",
   "private": true,
   "version": "5.0.42",
   "type": "module",
@@ -12,7 +12,7 @@
   "dependencies": {
     "@fastify/compress": "^8.1.0",
     "@fastify/cookie": "^11.0.2",
-    "@fastify/static": "^9.1.3",
+    "@fastify/static": "^10.1.6",
     "@headlessui/react": "^2.2.7",
     "@mercuryworkshop/bare-as-module3": "^2.2.5",
     "@mercuryworkshop/libcurl-transport": "^1.5.1",
@@ -28,13 +28,10 @@
     "jszip": "^3.10.1",
     "lucide-react": "^0.563.0",
     "movement.css": "^1.1.2",
-    "node-fetch": "^3.3.2",
     "nprogress": "^0.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-ga4": "^2.1.0",
     "react-router-dom": "^7.7.1",
-    "vite-plugin-static-copy": "^3.1.2",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
